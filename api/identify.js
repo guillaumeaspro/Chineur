@@ -44,7 +44,7 @@ module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") return res.status(405).json({ error: "method" });
 
-  const key = process.env.ANTHROPIC_API_KEY;
+  const key = String(process.env.ANTHROPIC_API_KEY || "").trim().replace(/^["']|["']$/g, "");
   if (!key) { console.error("ANTHROPIC_API_KEY manquante"); return res.status(500).json({ error: "server" }); }
 
   let body = req.body;
