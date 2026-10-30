@@ -87,9 +87,13 @@ module.exports = async function handler(req, res) {
   if (!r.ok) {
     const detail = await r.text().catch(() => "");
     console.error("Réponse de Claude", r.status, detail.slice(0, 500));
-    if (r.status === 429 || r.status === 529) return res.status(503).json({ error: "upstream_error" });
-    if (r.status === 400 && /image/i.test(detail)) return res.status(400).json({ error: "image_rejected" });
-    return res.status(502).json({ error: "server" });
+    let type = "";
+    try { type = JSON.parse(detail)?.error?.type || ""; } catch {}
+    if (r.status === 429 || r.status === 529) return res.status(503).json({ error: "upstream_error", detail: type });
+    if (r.status === 400 && /image/i.test(detail)) return res.status(400).json({ error: "image_rejected", detail: type });
+    // Le type d'erreur (jamais la clé) aide à diagnostiquer : clé refusée, modèle inconnu, crédit épuisé…
+    const hint = /credit|billing|balance/i.test(detail) ? "credit" : type;
+    return res.status(502).json({ error: "server", detail: hint, status: r.status });
   }
 
   const data = await r.json().catch(() => null);
