@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chineur</title>
+<meta name="description" content="Un coup de cœur ? Prends-le en photo, Chineur te montre où le trouver en seconde main : Vinted, Leboncoin, Back Market et compagnie.">
+<meta name="theme-color" content="#f3f6f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1716" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chineur">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow phone-first column, four screens (ajouter → analyse → objets repérés → où chercher), one obvious action per screen. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --ink: #142320;
+  --muted: #5b6b67;
+  --line: #dde5e2;
+  --accent: #0c7a63;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcf1ea;
+  --sun: #ffcf5c;
+  --sun-ink: #3a2c00;
+  --warn: #9a5b00;
+  --warn-soft: #fff1d6;
+  --danger: #b2381f;
+  --shadow: 0 1px 2px rgba(20, 35, 32, .06), 0 8px 24px rgba(20, 35, 32, .07);
+  --font-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1716; --surface: #172220; --ink: #e7efed; --muted: #9db0ab; --line: #26332f;
+    --accent: #4cc3a2; --accent-ink: #062019; --accent-soft: #1c3a32; --sun: #f2c14e; --sun-ink: #2a2000;
+    --warn: #f0b04a; --warn-soft: #3a2c12; --danger: #f08068; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1716; --surface: #172220; --ink: #e7efed; --muted: #9db0ab; --line: #26332f;
+  --accent: #4cc3a2; --accent-ink: #062019; --accent-soft: #1c3a32; --sun: #f2c14e; --sun-ink: #2a2000;
+  --warn: #f0b04a; --warn-soft: #3a2c12; --danger: #f08068; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body);
+  font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 16px 40px;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 480px; margin: 0 auto; display: grid; gap: 20px; }
+.top { display: flex; align-items: center; justify-content: space-between; }
+.logo { font-family: var(--font-display); font-weight: 800; font-size: 24px; letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px; }
+.beta { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--surface); border: 1px solid var(--line); padding: 3px 10px; border-radius: 99px; }
+
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 8vw, 40px); line-height: 1.05; letter-spacing: -0.03em; margin: 8px 0 0; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--accent); }
+h2 { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1.15; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+h3 { font-size: 15px; font-weight: 700; margin: 0; }
+p { margin: 0; }
+.sub { color: var(--muted); }
+section { display: grid; gap: 18px; }
+
+/* Primary actions */
+.actions { display: grid; gap: 10px; }
+.big-btn {
+  display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;
+  background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 18px;
+  font: 700 19px var(--font-body); padding: 20px; cursor: pointer; box-shadow: var(--shadow);
+  transition: transform .12s ease, filter .12s ease;
+}
+.big-btn.alt { background: var(--surface); color: var(--ink); border: 2px solid var(--accent); box-shadow: none; }
+.big-btn:hover { filter: brightness(1.06); }
+.big-btn:active { transform: scale(.98); }
+.big-btn svg { width: 26px; height: 26px; flex: none; }
+@media (hover: hover) and (pointer: fine) { .phone-only { display: none !important; } }
+button { font-family: var(--font-body); }
+.secondary {
+  width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); font-weight: 700; font-size: 16px; cursor: pointer;
+}
+.secondary:hover { border-color: var(--ink); }
+.link { background: none; border: 0; color: var(--accent); font-weight: 700; font-size: 15px; cursor: pointer; padding: 6px 0; justify-self: center; }
+.back { justify-self: start; padding: 0; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; border-radius: 8px; }
+
+/* Drop area (desktop) */
+.drop { border: 2px dashed var(--line); border-radius: 22px; padding: 18px; display: grid; gap: 12px; background: var(--surface); transition: border-color .15s, background .15s; }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop .hint { text-align: center; font-size: 14px; color: var(--muted); }
+@media (hover: none) { .drop { border: 0; padding: 0; background: none; } .drop .desk { display: none; } }
+
+.how { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
+.how li { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; }
+.how li::before {
+  counter-increment: s; content: counter(s); flex: none; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: 13px; display: grid; place-items: center;
+}
+.how b { font-weight: 700; }
+
+form.inline { display: flex; gap: 8px; }
+input[type="text"] {
+  flex: 1; min-width: 0; font: 500 16px var(--font-body); padding: 14px 14px; border-radius: 14px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+form.inline button { border: 0; border-radius: 14px; padding: 0 18px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 15px; cursor: pointer; }
+
+/* Loading */
+.scan { position: relative; border-radius: 22px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); display: grid; gap: 4px; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); }
+.scan img { width: 100%; height: 100%; max-height: 52vh; object-fit: cover; display: block; }
+.scan.single img { object-fit: contain; }
+.scan.empty { min-height: 220px; }
+img.broken { visibility: hidden; }
+.item img, .found img { background: var(--bg) center / 28px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239db0ab' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='3'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-4.5-4.5L7 20'/%3E%3C/svg%3E"); }
+.item img.broken, .found img.broken { visibility: visible; }
+.toast { display: grid; gap: 10px; }
+.toast .install-btn { justify-self: start; }
+.beam { position: absolute; left: 0; right: 0; height: 30%; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 35%, transparent), transparent); animation: sweep 1.8s ease-in-out infinite; }
+@keyframes sweep { from { top: -30%; } to { top: 100%; } }
+.loading-text { text-align: center; display: grid; gap: 4px; }
+.loading-text p:first-child { font-family: var(--font-display); font-weight: 800; font-size: 22px; }
+
+/* Found objects list */
+.items { display: grid; gap: 10px; }
+.item {
+  display: flex; align-items: center; gap: 14px; text-align: left; width: 100%; cursor: pointer;
+  background: var(--surface); border: 0; border-radius: 18px; padding: 12px; color: var(--ink); box-shadow: var(--shadow);
+  transition: transform .12s ease;
+}
+.item:hover { transform: translateX(3px); }
+.item img { width: 64px; height: 76px; object-fit: cover; border-radius: 12px; flex: none; background: var(--bg); }
+.item > span { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.item strong { font-size: 16px; line-height: 1.25; }
+.item small { color: var(--muted); font-size: 13px; }
+.item .arrow { font-size: 20px; color: var(--accent); flex: none; }
+
+/* Result */
+.found { display: flex; gap: 14px; align-items: center; background: var(--surface); border-radius: 22px; padding: 14px; box-shadow: var(--shadow); }
+.found img { width: 84px; height: 104px; object-fit: cover; border-radius: 14px; flex: none; background: var(--bg); }
+.found > div { min-width: 0; display: grid; gap: 6px; }
+.meta { color: var(--muted); font-size: 14px; }
+.pill { justify-self: start; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+.pill.sure { background: var(--accent-soft); color: var(--accent); }
+.pill.likely { background: var(--sun); color: var(--sun-ink); }
+.pill.check { background: var(--warn-soft); color: var(--warn); }
+
+.fix { background: var(--warn-soft); color: var(--ink); border-radius: 16px; padding: 14px; display: grid; gap: 10px; font-size: 14px; }
+.fix-toggle { justify-self: start; }
+
+.modes { display: grid; gap: 10px; }
+.mode {
+  display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; cursor: pointer;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 14px; color: var(--ink);
+}
+.mode .dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; }
+.mode[aria-checked="true"] { border-color: var(--accent); }
+.mode[aria-checked="true"] .dot { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 4px var(--surface); }
+.mode span { display: grid; min-width: 0; }
+.mode strong { font-size: 16px; }
+.mode small { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+
+.sites { display: grid; gap: 10px; }
+.site {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; text-decoration: none;
+  background: var(--surface); color: var(--ink); box-shadow: var(--shadow); transition: transform .12s ease;
+}
+.site:hover { transform: translateX(3px); }
+.site .badge { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); font-weight: 800; display: grid; place-items: center; flex: none; font-family: var(--font-display); font-size: 18px; }
+.site span:nth-child(2) { display: grid; flex: 1; min-width: 0; }
+.site strong { font-size: 16px; }
+.site small { color: var(--muted); font-size: 13px; }
+.site .arrow { font-size: 20px; color: var(--accent); }
+
+.install { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border-radius: 18px; padding: 14px; box-shadow: var(--shadow); font-size: 14px; }
+.install img { border-radius: 11px; flex: none; }
+.install > div { display: grid; gap: 4px; min-width: 0; }
+.install-actions { display: flex; gap: 14px; align-items: center; margin-top: 4px; }
+.install-btn { border: 0; border-radius: 10px; padding: 8px 14px; background: var(--accent); color: var(--accent-ink); font-weight: 700; cursor: pointer; }
+.install .link { justify-self: auto; padding: 0; font-size: 14px; }
+.toast { background: var(--surface); border-left: 4px solid var(--danger); border-radius: 12px; padding: 12px 14px; font-size: 14px; box-shadow: var(--shadow); }
+.foot { text-align: center; font-size: 12px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .beam { animation: none; top: 35%; } * { transition: none !important; } }
+</style>
+
+<main class="app">
+  <header class="top">
+    <div class="logo"><svg viewBox="14 48 172 104" width="40" height="24" aria-hidden="true"><path d="M24 100 C 50 68, 76 58, 100 58 C 124 58, 150 68, 176 100 C 150 132, 124 142, 100 142 C 76 142, 50 132, 24 100 Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="16" stroke-linejoin="round"/><circle cx="100" cy="100" r="34" fill="#ffffff"/><circle cx="100" cy="100" r="18" fill="#142320"/><circle cx="108" cy="92" r="6" fill="#ffcf5c"/></svg>Chineur</div>
+    <span class="beta">Version test</span>
+  </header>
+
+  <!-- Écran 1 : ajouter -->
+  <section id="s-start">
+    <div style="display:grid;gap:10px">
+      <h1>Un coup de cœur ? <em>Trouve-le en seconde main.</em></h1>
+      <p class="sub">Sur un site, dans un reel ou dans la vraie vie : prends une photo ou une capture, on te montre où le dénicher moins cher sur Vinted, Leboncoin, Back Market et compagnie.</p>
+    </div>
+    <div class="drop" id="drop">
+      <div class="actions">
+        <label class="big-btn phone-only" for="camera" tabindex="0" id="pickCamera">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+          Prendre une photo
+        </label>
+        <label class="big-btn alt" for="file" tabindex="0" id="pick">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L7 20"/></svg>
+          Ajouter des captures
+        </label>
+      </div>
+      <p class="hint"><span id="hintCount">Jusqu'à 4 images d'un coup, par exemple plusieurs captures d'un même reel.</span><span class="desk"> Tu peux aussi les glisser ici ou les coller avec Ctrl+V.</span></p>
+    </div>
+    <input type="file" id="camera" accept="image/*,.heic,.heif" capture="environment" hidden>
+    <input type="file" id="file" accept="image/*,.heic,.heif" multiple hidden>
+    <ol class="how">
+      <li><span><b>Repère un objet</b> : sur une fiche produit, dans une vidéo, en vitrine ou chez des amis.</span></li>
+      <li><span><b>Prends-le en photo ou en capture</b> : on reconnaît chaque objet en quelques secondes.</span></li>
+      <li><span><b>Choisis un site</b> et découvre les annonces.</span></li>
+    </ol>
+    <button class="link" id="toManual" type="button">Pas d'image ? Décris l'objet</button>
+    <form class="inline" id="manualForm" hidden>
+      <input type="text" id="manualInput" placeholder="ex. iphone 13, trench beige, table en chêne" aria-label="Décris l'objet">
+      <button type="submit">Chercher</button>
+    </form>
+    <div class="toast" id="startError" role="alert" hidden>
+      <p id="startErrorText"></p>
+      <button type="button" class="install-btn" id="retryBtn" hidden>Réessayer</button>
+    </div>
+    <div class="install" id="install" hidden>
+      <img src="icons/apple-touch-icon.png" alt="" width="44" height="44" onerror="this.remove()">
+      <div>
+        <p><b>Garde Chineur sous la main</b></p>
+        <p class="sub" id="installIos" hidden>Touche <b>Partager</b> dans Safari, puis <b>Sur l'écran d'accueil</b>.</p>
+        <p class="sub" id="installOther" hidden>Ajoute-le à ton écran d'accueil pour l'ouvrir comme une app.</p>
+        <div class="install-actions">
+          <button type="button" class="install-btn" id="installBtn" hidden>Installer</button>
+          <button type="button" class="link" id="installClose">Plus tard</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Écran 2 : analyse -->
+  <section id="s-loading" hidden>
+    <div class="scan" id="scan"><div class="beam"></div></div>
+    <div class="loading-text" role="status">
+      <p id="loadTitle">On regarde ton image…</p>
+      <p class="sub">On repère les objets et leur marque : ça prend quelques secondes.</p>
+      <p class="sub" id="loadNote" hidden></p>
+    </div>
+    <button class="secondary" id="cancel" type="button">Annuler</button>
+  </section>
+
+  <!-- Écran 3 : objets repérés -->
+  <section id="s-list" hidden>
+    <div style="display:grid;gap:6px">
+      <h2 id="listTitle"></h2>
+      <p class="sub">Choisis celui que tu veux retrouver en seconde main.</p>
+    </div>
+    <div class="items" id="items"></div>
+    <button class="secondary" id="againList" type="button">Recommencer avec d'autres images</button>
+  </section>
+
+  <!-- Écran 4 : où chercher -->
+  <section id="s-result" hidden>
+    <button class="link back" id="backToList" type="button" hidden>← Tous les objets repérés</button>
+    <div class="found">
+      <img id="resImg" alt="" hidden>
+      <div>
+        <span class="pill" id="pill"></span>
+        <h2 id="resTitle"></h2>
+        <p class="meta" id="resMeta"></p>
+        <p class="meta" id="resPrice" hidden></p>
+      </div>
+    </div>
+
+    <button class="link fix-toggle" id="fixToggle" type="button">Ce n'est pas tout à fait ça ?</button>
+    <div class="fix" id="fixBox" hidden>
+      <p id="fixText">Dis-nous la marque ou le type d'objet, on relance l'analyse.</p>
+      <form class="inline" id="fixForm">
+        <input type="text" id="fixInput" placeholder="ex. Zara, trench" aria-label="Précision sur l'objet">
+        <button type="submit">Relancer</button>
+      </form>
+    </div>
+
+    <h3>Que veux-tu trouver ?</h3>
+    <div class="modes" id="modes" role="radiogroup" aria-label="Type de recherche"></div>
+
+    <h3>Où chercher</h3>
+    <div class="sites" id="sites"></div>
+
+    <button class="secondary" id="again" type="button">Chercher autre chose</button>
+  </section>
+
+  <section id="s-code" hidden>
+    <button class="link back" id="codeBack" type="button">← Retour</button>
+    <h2>Code d'accès</h2>
+    <p class="sub">Cette version test est réservée. Entre le code que l'on t'a donné.</p>
+    <form class="inline" id="codeForm">
+      <input type="text" id="codeInput" autocomplete="off" autocapitalize="off" aria-label="Code d'accès">
+      <button type="submit">Valider</button>
+    </form>
+    <p class="sub" id="codeErr" style="color: var(--danger)" hidden>Ce code ne fonctionne pas. Vérifie-le et réessaie.</p>
+  </section>
+
+  <p class="foot">Les annonces s'ouvrent directement sur chaque site.</p>
+</main>
+
+<script>
+const PROMPT_TEMPLATE = "Tu reçois {{COUNT}} envoyée(s) par un utilisateur qui veut retrouver en seconde main des objets qui lui ont plu, sur des sites comme Vinted, Leboncoin, eBay, Back Market, Vestiaire Collective ou Facebook Marketplace. Chaque image peut être :\n- une capture d'une fiche produit sur un site de vente (Zara, Asos, Nike, Apple, Fnac, Ikea, Maisons du Monde, Amazon…) ;\n- une capture d'une vidéo ou d'un post de réseau social (reel Instagram, TikTok, Pinterest…), par exemple une déco d'intérieur ou un « Ikea hack » ;\n- une photo prise sur le vif : une vitrine, un meuble chez quelqu'un, un objet dans la rue.\nLes images sont numérotées dans l'ordre d'envoi, à partir de 1.\n{{HINT}}\nÉtape 1 : repère les objets à rechercher.\n- Sur une capture de fiche produit, ne retiens que le produit principal de la page.\n- Sur une capture de réseau social ou une photo, retiens les objets nettement visibles qu'on pourrait vouloir acheter (meubles, luminaires, déco, vêtements, chaussures, sacs, appareils…), en commençant par le plus mis en valeur. Ignore les éléments flous, minuscules ou impossibles à acheter (murs, plantes en pleine terre, nourriture).\n- Ne décris jamais les personnes elles-mêmes (visage, corps, identité) : seulement les objets. Un vêtement porté peut être retenu s'il est clairement le sujet de l'image.\n- Si le même objet apparaît sur plusieurs images, ne le compte qu'une fois.\n- Au total, 4 objets maximum, triés du plus intéressant au moins intéressant.\n\nÉtape 2 : pour chaque objet, détermine sa catégorie parmi :\n- \"mode\" : vêtements, chaussures, sacs, bijoux, montres, accessoires de mode ;\n- \"high-tech\" : téléphones, ordinateurs, tablettes, consoles, audio, photo, objets connectés ;\n- \"maison\" : meubles, luminaires, déco, vaisselle, linge de maison, électroménager ;\n- \"loisirs\" : sport, vélo, jeux, jouets, livres, puériculture, instruments de musique ;\n- \"autre\" : tout le reste.\n\nÉtape 3 : identifie chaque objet en t'appuyant sur ce qui est visible et sur la précision éventuelle de l'utilisateur. Pour trouver la marque, examine tout le contexte : barre d'adresse ou URL, logo ou nom du site, nom et référence du produit, légende ou texte incrusté d'une vidéo, étiquettes, logos ou textes sur l'objet. Sur un site multimarque, la marque est souvent écrite près du nom du produit. Si la marque est déduite d'indices sans être écrite noir sur blanc, mets \"confiance\" à \"moyenne\".\n- N'invente jamais une marque, un modèle ou une caractéristique technique : si la marque n'est ni visible ni donnée par l'utilisateur, laisse \"marque\" vide et mets \"confiance\" à \"faible\" ou \"moyenne\". Sur une photo prise sur le vif ou une capture de vidéo, c'est le cas le plus fréquent : décris alors l'objet avec précision pour trouver des pièces similaires.\n- Si la marque est inconnue, \"modele\" est un nom descriptif court (ex. \"Manteau long oversize\", \"Buffet bas en bois\").\n- \"matiere\" : matière apparente pour la mode et la maison ; chaîne vide pour la high-tech.\n- \"details\" : 2 à 4 caractéristiques distinctives. En high-tech : capacité, taille d'écran, génération ou année si visibles. En maison : style (scandinave, industriel, vintage…) et dimensions si visibles. En mode : coupe, longueur, col, fermeture, motif.\n\nVocabulaire des requêtes (très important) : les requêtes doivent reprendre les mots que les particuliers écrivent vraiment dans leurs annonces, pas le vocabulaire des fiches produit ni le jargon marketing. Les champs \"modele\" et \"details\" peuvent rester précis, mais dans les requêtes :\n- utilise le terme courant le plus répandu : \"trench\" plutôt que \"gabardine\", \"doudoune\" plutôt que \"parka matelassée\", \"pull\" plutôt que \"maille\", \"baskets\" plutôt que \"sneakers basses\", \"canapé\" plutôt que \"sofa modulable\", \"enceinte\" plutôt que \"haut-parleur connecté\", \"casque\" plutôt que \"headset\" ;\n- n'utilise jamais les noms commerciaux propres à l'enseigne (noms de collection, références internes, \"effet laine\", \"relaxed fit\"…). Exception : en maison, les noms de modèles Ikea et de designers connus sont très recherchés (Kallax, Billy, Poäng, Tulip, Eames…), garde-les ;\n- garde le nom de modèle quand les gens recherchent par ce nom : modèles iconiques de mode (Air Force 1, Stan Smith, Samba, 501, Speedy…) et, en high-tech, toujours le modèle et la génération (iphone 13, ps5, airpods pro 2, macbook air m2) ;\n- en high-tech, ajoute la capacité si elle est visible (\"128 go\") dans la requête précise seulement ;\n- couleurs simples et usuelles : \"beige\" plutôt que \"camel sable\", \"bleu marine\" plutôt que \"navy\", \"kaki\" plutôt que \"vert olive\" ;\n- pas de mots inutiles (femme/homme seulement si l'article est clairement genré, pas d'adjectifs vagues comme \"élégant\", \"tendance\" ou \"premium\").\n\nExigence de précision (prioritaire) : l'utilisateur veut retrouver exactement ses objets.\n- La requête \"Précise\" doit contenir tous les éléments qui distinguent l'objet de ses voisins et qu'un vendeur mettrait dans son titre : modèle exact, version ou génération (pro, max, mini, 2e génération, m2…), capacité ou taille d'écran en high-tech, couleur exacte en mode et en maison. Une requête trop vague (ex. \"iphone\" ou \"baskets nike\") est une erreur.\n- Un mot faux est pire qu'un mot absent : une mauvaise génération, capacité ou couleur fait disparaître les bonnes annonces. N'inclus dans les requêtes que les éléments que tu as lus ou vus avec certitude ; en cas de doute sur un élément, retire-le de la requête et mentionne le doute dans \"details\".\n- Avant de répondre, relis les images et vérifie un par un chaque élément de \"modele\" et de la requête \"Précise\". Sur une fiche produit, si la page affiche une variante sélectionnée (couleur, capacité, taille), c'est celle-là qui compte.\n- \"confiance\" vaut \"haute\" uniquement si la marque ET le modèle exact sont lisibles ou certains.\n\nRéponds uniquement avec un objet JSON de cette forme :\n{\"articles\": [{\"image\": 1, \"categorie_globale\": \"mode\", \"marque\": \"Nike\", \"modele\": \"Air Force 1 '07\", \"categorie\": \"Baskets basses\", \"couleur\": \"Blanc\", \"matiere\": \"Cuir\", \"details\": \"Semelle blanche, swoosh cousu\", \"prix_neuf_estime\": \"≈ 120 €\", \"confiance\": \"haute\", \"requetes\": [{\"type\": \"Précise\", \"q\": \"nike air force 1 07 blanc\"}, {\"type\": \"Large\", \"q\": \"air force 1 blanche\"}, {\"type\": \"Équivalent\", \"q\": \"baskets cuir blanches basses\"}]}]}\n\nRègles : textes en français ; \"image\" est le numéro de l'image où l'objet se voit le mieux ; \"categorie_globale\" vaut exactement \"mode\", \"high-tech\", \"maison\", \"loisirs\" ou \"autre\" ; \"confiance\" vaut \"haute\", \"moyenne\" ou \"faible\" ; utilise une chaîne vide si une information n'est pas visible ; \"prix_neuf_estime\" : le prix affiché s'il est visible, sinon ton estimation du prix neuf, ou vide si tu ne sais pas ; si aucun objet exploitable n'est visible, renvoie {\"articles\": []} ; pour chaque objet, donne exactement 3 requêtes de 2 à 6 mots, en minuscules, rédigées comme un particulier titrerait son annonce sur Leboncoin ou Vinted :\n- \"Précise\" : le même objet (marque + modèle + couleur, ou capacité en high-tech ; sans marque connue : type + détail le plus distinctif + couleur) ;\n- \"Large\" : plus de résultats (marque + type d'objet, ou modèle sans capacité ni couleur en high-tech ; sans marque : type + couleur) ;\n- \"Équivalent\" : une alternative (mode et maison : sans marque, style + matière + couleur ; high-tech : le modèle de la génération précédente ou un concurrent direct du même niveau, ex. \"iphone 12\" pour un iPhone 13, ou \"galaxy buds\" pour des AirPods).";
+const MAX_IMAGES = 4;
+
+const S = {
+  vinted: what => ({ name: "Vinted", what, url: q => "https://www.vinted.fr/catalog?search_text=" + q }),
+  vestiaire: what => ({ name: "Vestiaire Collective", what, url: q => "https://fr.vestiairecollective.com/search/?q=" + q }),
+  lbc: what => ({ name: "Leboncoin", what, url: q => "https://www.leboncoin.fr/recherche?text=" + q }),
+  ebay: what => ({ name: "eBay", what, url: q => "https://www.ebay.fr/sch/i.html?_nkw=" + q }),
+  depop: what => ({ name: "Depop", what, url: q => "https://www.depop.com/search/?q=" + q }),
+  backmarket: what => ({ name: "Back Market", what, url: q => "https://www.backmarket.fr/fr-fr/search?q=" + q }),
+  marketplace: what => ({ name: "Facebook Marketplace", what, url: q => "https://www.facebook.com/marketplace/search/?query=" + q }),
+};
+const CATEGORIES = {
+  mode: { label: "Mode", modes: ["Le même article", "Plus de choix", "Un style similaire"], sites: [
+    S.vinted("Le plus de choix en France"), S.vestiaire("Marques premium vérifiées"), S.lbc("Entre particuliers, près de chez toi"),
+    S.ebay("Neuf avec étiquette et bonnes affaires"), S.depop("Streetwear et vintage")] },
+  "high-tech": { label: "High-tech", modes: ["Le même modèle", "Plus de choix", "Une alternative"], sites: [
+    S.backmarket("Reconditionné et garanti"), S.lbc("Entre particuliers, souvent moins cher"), S.ebay("Neuf, occasion et enchères"),
+    S.vinted("Petits prix entre particuliers"), S.marketplace("Entre particuliers, près de chez toi")] },
+  maison: { label: "Maison", modes: ["Le même meuble ou objet", "Plus de choix", "Un style similaire"], sites: [
+    S.lbc("Le plus de meubles d'occasion"), S.marketplace("Entre voisins, à récupérer sur place"), S.vinted("Déco et petits objets"),
+    S.ebay("Vintage et pièces de designers")] },
+  loisirs: { label: "Loisirs", modes: ["Le même article", "Plus de choix", "Une alternative"], sites: [
+    S.lbc("Sport, vélos, jeux et bien plus"), S.vinted("Jouets, livres, puériculture"), S.ebay("Collection et pièces rares"),
+    S.marketplace("Entre particuliers, près de chez toi")] },
+  autre: { label: "", modes: ["Le même article", "Plus de choix", "Une alternative"], sites: [
+    S.lbc("Le plus grand choix entre particuliers"), S.ebay("Neuf, occasion et enchères"), S.vinted("Petits prix entre particuliers"),
+    S.marketplace("Entre particuliers, près de chez toi"), S.backmarket("Si c'est de l'électronique")] },
+};
+const cat = d => CATEGORIES[d?.categorie_globale] || CATEGORIES.autre;
+const CONF = { haute: ["sure", "Objet reconnu"], moyenne: ["likely", "Très probable"], faible: ["check", "À vérifier"] };
+
+const $ = id => document.getElementById(id);
+let photos = [];          // [{ blob: copie JPEG prête à envoyer, url: aperçu de cette copie }]
+let articles = [];        // objets repérés
+let current = null, currentIdx = -1, active = 0, ctl = null, busy = false, lastRetry = null;
+
+/* ---------- Où tourne l'analyse ----------
+   En ligne (Vercel) : la page appelle /api/identify, qui utilise ta clé API.
+   Aperçu dans Claude : la page interroge Claude sur le compte de la personne. */
+let sample = null, maxImages = MAX_IMAGES;
+const ready = (async () => {
+  if (!window.claude?.use) return "server";
+  try {
+    const s = await window.claude.use("sample");
+    const caps = s ? await s.limits().catch(() => null) : null;
+    if (s && caps?.images) { sample = s; maxImages = Math.max(1, Math.min(MAX_IMAGES, caps.images.maxCount || 1)); return "claude"; }
+    if (s) return "noimages";
+  } catch {}
+  return "none";
+})();
+ready.then(() => { if (maxImages < MAX_IMAGES) $("hintCount").textContent = maxImages > 1 ? `Jusqu'à ${maxImages} images d'un coup.` : "Une image à la fois."; });
+
+function buildPrompt(hint, count) {
+  const h = String(hint || "").replace(/["\n\r]/g, " ").slice(0, 200).trim();
+  return PROMPT_TEMPLATE
+    .replace("{{COUNT}}", count > 1 ? count + " images" : "une image")
+    .replace("{{HINT}}", h ? `\nL'utilisateur précise : "${h}". Considère ces informations comme fiables (par exemple la marque).\n` : "");
+}
+
+function screen(name) {
+  for (const id of ["s-start", "s-loading", "s-list", "s-result", "s-code"]) $(id).hidden = id !== name;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function startError(msg, retry) {
+  $("startErrorText").textContent = msg || "";
+  $("startError").hidden = !msg;
+  lastRetry = msg && retry ? retry : null;
+  $("retryBtn").hidden = !lastRetry;
+}
+
+/* ---------- Préparation des images ----------
+   Dès qu'une image est choisie, on la décode puis on en fait une copie JPEG (1600 px max).
+   Aperçus ET analyse utilisent cette copie : plus d'aperçu cassé (HEIC, très grosses photos,
+   fichiers sans type) et toujours un format et une taille que Claude accepte. */
+const MAX_SIDE = 1600;
+const notImage = f => /^(video|audio|text)\//.test(f.type) || /^application\/(?!octet-stream)/.test(f.type);
+
+async function isHeic(file) {
+  if (/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name || "")) return true;
+  try {
+    const b = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    const s = String.fromCharCode(...b.slice(4, 12));
+    return s.startsWith("ftyp") && /^(heic|heix|hevc|hevx|heim|heis|mif1|msf1)$/.test(s.slice(4));
+  } catch { return false; }
+}
+
+// Deux façons de décoder, la seconde rattrape la première (mémoire, formats).
+async function decode(blob) {
+  try {
+    const bmp = await createImageBitmap(blob);
+    if (bmp.width && bmp.height) return { src: bmp, w: bmp.width, h: bmp.height, done: () => bmp.close?.() };
+    bmp.close?.();
+  } catch {}
+  const url = URL.createObjectURL(blob);
+  try {
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    if (!img.naturalWidth) throw 0;
+    return { src: img, w: img.naturalWidth, h: img.naturalHeight, done: () => URL.revokeObjectURL(url) };
+  } catch { URL.revokeObjectURL(url); return null; }
+}
+
+function dataUrlToBlob(u) {
+  const [head, b64] = u.split(",");
+  const bin = atob(b64), arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: head.slice(5).split(";")[0] || "image/jpeg" });
+}
+
+async function toJpeg(d) {
+  const k = Math.min(1, MAX_SIDE / Math.max(d.w, d.h));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(d.w * k)); c.height = Math.max(1, Math.round(d.h * k));
+  const g = c.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); // fond blanc pour les PNG transparents
+  g.drawImage(d.src, 0, 0, c.width, c.height);
+  let blob = await new Promise(r => { try { c.toBlob(r, "image/jpeg", 0.85); } catch { r(null); } });
+  if (!blob) { try { blob = dataUrlToBlob(c.toDataURL("image/jpeg", 0.85)); } catch {} }
+  c.width = c.height = 0; // libère la mémoire tout de suite (important sur iPhone)
+  return blob && blob.size > 0 && blob.type === "image/jpeg" ? blob : null;
+}
+
+let heicLib = null;
+function loadHeicLib() {
+  heicLib ||= new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js";
+    s.onload = () => window.heic2any ? res(window.heic2any) : rej();
+    s.onerror = rej;
+    document.head.append(s);
+  }).catch(e => { heicLib = null; throw e; });
+  return heicLib;
+}
+
+async function prepare(file) {
+  let d = await decode(file);
+  if (!d && await isHeic(file)) {
+    try {
+      const out = await (await loadHeicLib())({ blob: file, toType: "image/jpeg", quality: 0.85 });
+      d = await decode(Array.isArray(out) ? out[0] : out);
+    } catch {}
+    if (!d) throw { code: "heic" };
+  }
+  if (!d) throw { code: "unreadable" };
+  let blob = null;
+  try { blob = await toJpeg(d); } catch {} finally { d.done(); }
+  if (!blob) throw { code: "unreadable" };
+  return { blob, url: URL.createObjectURL(blob) };
+}
+
+function setImg(img, url) {
+  img.classList.remove("broken");
+  img.onerror = () => { img.removeAttribute("src"); img.classList.add("broken"); };
+  if (url) img.src = url; else img.onerror();
+}
+
+const toBase64 = blob => new Promise((res, rej) => {
+  const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1]); fr.onerror = rej; fr.readAsDataURL(blob);
+});
+function getCode() { try { return localStorage.getItem("chineur-code") || ""; } catch { return ""; } }
+
+async function analyse(blobs, hint) {
+  const mode = await ready;
+  if (mode === "claude") {
+    try {
+      return await sample.json(buildPrompt(hint, blobs.length), { images: blobs, signal: ctl.signal, modelTier: "complex" });
+    } catch (e) { throw { code: e?.code || "upstream_error" }; }
+  }
+  if (mode === "none") throw { code: "unavailable" };
+  if (mode === "noimages") throw { code: "images_unavailable" };
+  const images = await Promise.all(blobs.map(async b => ({ data: await toBase64(b), mediaType: "image/jpeg" })));
+  const r = await fetch("/api/identify", {
+    method: "POST", headers: { "Content-Type": "application/json" }, signal: ctl.signal,
+    body: JSON.stringify({ images, hint, code: getCode() }),
+  }).catch(e => { throw e?.name === "AbortError" ? { code: "cancelled" } : { code: "network" }; });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw { code: data.error || (r.status === 413 ? "too_large" : "server") };
+  return data;
+}
+
+function normalize(d, imageCount) {
+  const list = Array.isArray(d) ? d : Array.isArray(d?.articles) ? d.articles : (d?.requetes ? [d] : []);
+  return list.filter(a => a && Array.isArray(a.requetes) && a.requetes.some(r => r && r.q)).slice(0, 4).map(a => {
+    const img = Math.min(Math.max(parseInt(a.image, 10) || 1, 1), imageCount) - 1;
+    return { ...a, imageIdx: img, requetes: a.requetes.filter(r => r && r.q).slice(0, 3).map(r => ({ type: String(r.type || ""), q: String(r.q) })) };
+  });
+}
+
+const MESSAGES = {
+  rate_limited: "Tu as fait beaucoup de recherches d'affilée. Patiente quelques minutes puis réessaie.",
+  limit: "Tu as fait beaucoup de recherches aujourd'hui. Réessaie demain.",
+  image_rejected: "Une image n'a pas été acceptée. Essaie avec une autre photo ou une capture d'écran.",
+  too_large: "Ces images sont trop lourdes. Essaie avec moins d'images à la fois.",
+  unreadable: "Cette image n'a pas pu être ouverte. Essaie avec une capture d'écran ou une photo en JPEG ou PNG.",
+  heic: "Cette photo est au format HEIC, que ce navigateur ne sait pas ouvrir. Fais une capture d'écran de la photo et ajoute-la à la place.",
+  invalid_json: "L'analyse n'a pas abouti. Réessaie avec les mêmes images.",
+  empty_completion: "L'analyse n'a rien renvoyé. Réessaie avec les mêmes images.",
+  upstream_error: "La connexion avec Claude a été coupée. Réessaie.",
+  network: "Pas de connexion. Vérifie ton réseau et réessaie.",
+  server: "Petit souci de notre côté. Réessaie dans un instant.",
+  refused: "Ces images n'ont pas pu être analysées. Essaie avec une autre photo de l'objet.",
+  session_expired: "Ta session Claude a expiré. Reconnecte-toi, puis réessaie.",
+  sampling_disabled: "Claude n'est pas disponible sur ce compte. Décris l'objet à la main.",
+  capability_disabled: "L'analyse photo n'est pas disponible ici. Mets à jour l'appli Claude ou ouvre le lien sur claude.ai.",
+  capability_removed: "L'analyse photo n'est pas disponible ici. Mets à jour l'appli Claude ou ouvre le lien sur claude.ai.",
+  not_declared: "L'analyse photo n'est pas disponible ici. Décris l'objet à la main.",
+  unavailable: "Pour analyser une photo, ouvre Chineur en étant connecté à ton compte Claude. Sinon, décris l'objet à la main.",
+  images_unavailable: "Cette version de Claude ne peut pas encore analyser de photos. Ouvre Chineur dans l'appli Claude ou sur claude.ai à jour, ou décris l'objet à la main.",
+  not_granted: "Sans autorisation, l'analyse ne peut pas se faire. Recharge la page et accepte la demande de Claude, ou décris l'objet à la main.",
+  empty: "On n'a repéré aucun objet sur ces images. Essaie avec une image où l'objet est bien visible.",
+};
+const RETRYABLE = new Set(["invalid_json", "empty_completion", "upstream_error", "network", "server"]);
+const msgFor = code => (MESSAGES[code] || MESSAGES.server) + ` (code : ${code})`;
+
+function showLoading(list, title, note) {
+  const scan = $("scan");
+  scan.querySelectorAll("img").forEach(i => i.remove());
+  scan.classList.toggle("single", list.length <= 1);
+  scan.classList.toggle("empty", !list.length);
+  scan.style.setProperty("--cols", list.length <= 1 ? 1 : 2);
+  list.forEach(p => { const im = document.createElement("img"); im.alt = ""; setImg(im, p.url); scan.prepend(im); });
+  $("loadTitle").textContent = title || (list.length > 1 ? `On regarde tes ${list.length} images…` : "On regarde ton image…");
+  $("loadNote").textContent = note || ""; $("loadNote").hidden = !note;
+  screen("s-loading");
+}
+
+async function runAll(note) {
+  ctl = new AbortController();
+  showLoading(photos, "", typeof note === "string" ? note : "");
+  try {
+    const list = normalize(await analyse(photos.map(p => p.blob), ""), photos.length);
+    if (!list.length) throw { code: "empty" };
+    articles = list;
+    if (articles.length === 1) openArticle(0); else showList();
+  } catch (e) { handleError(e, () => runAll()); }
+}
+
+async function rerun(idx, hint) {
+  const a = articles[idx], p = a && photos[a.imageIdx];
+  if (!p) return;
+  ctl = new AbortController();
+  showLoading([p]);
+  try {
+    const list = normalize(await analyse([p.blob], hint), 1);
+    if (!list.length) throw { code: "empty" };
+    articles[idx] = { ...list[0], imageIdx: a.imageIdx, hint };
+    openArticle(idx);
+  } catch (e) { handleError(e, () => rerun(idx, hint), true); }
+}
+
+function handleError(e, retry, fromResult) {
+  const code = e?.code || "upstream_error";
+  if (code === "cancelled") { screen(articles.length ? "s-result" : "s-start"); return; }
+  if (code === "code") { pendingRetry = retry; $("codeErr").hidden = !getCode(); $("codeInput").value = getCode(); screen("s-code"); return; }
+  if (fromResult && current) { // une relance ratée : on garde le résultat affiché
+    showResult(current);
+    $("fixBox").hidden = false;
+    $("fixText").textContent = msgFor(code);
+    return;
+  }
+  articles = [];
+  screen("s-start");
+  startError(msgFor(code), RETRYABLE.has(code) && photos.length ? retry : null);
+}
+let pendingRetry = null;
+
+async function addPhotos(fileList) {
+  if (busy) return;
+  const files = [...fileList].filter(f => f && !notImage(f));
+  if (!files.length) { startError("Choisis une photo ou une capture d'écran."); return; }
+  busy = true;
+  startError("");
+  ctl = new AbortController();
+  showLoading([], files.length > 1 ? "On prépare tes images…" : "On prépare ton image…");
+  await ready;
+  const kept = files.slice(0, maxImages), done = [];
+  let failed = 0, lastErr = null;
+  for (const f of kept) { // une par une : évite de saturer la mémoire du téléphone
+    if (ctl.signal.aborted) break;
+    try { done.push(await prepare(f)); } catch (e) { failed++; lastErr = e; }
+  }
+  busy = false;
+  if (ctl.signal.aborted) { done.forEach(p => URL.revokeObjectURL(p.url)); screen("s-start"); return; }
+  if (!done.length) { screen("s-start"); startError(msgFor(lastErr?.code || "unreadable")); return; }
+  photos.forEach(p => URL.revokeObjectURL(p.url));
+  photos = done; articles = [];
+  const notes = [];
+  if (files.length > kept.length) notes.push(`On a gardé les ${kept.length} premières images.`);
+  if (failed) notes.push(failed > 1 ? `${failed} images n'ont pas pu être ouvertes, on continue sans elles.` : "Une image n'a pas pu être ouverte, on continue sans elle.");
+  runAll(notes.join(" "));
+}
+
+function isUncertain(d) { return !d.manual && (!String(d.marque || "").trim() || d.confiance === "faible"); }
+function titleOf(d) { return d.modele || d.categorie || "Objet"; }
+
+function showList() {
+  $("listTitle").textContent = `${articles.length} objets repérés`;
+  $("items").innerHTML = "";
+  articles.forEach((a, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "item";
+    b.innerHTML = '<img alt=""><span><strong></strong><small></small></span><span class="arrow" aria-hidden="true">→</span>';
+    setImg(b.querySelector("img"), photos[a.imageIdx]?.url);
+    b.querySelector("strong").textContent = titleOf(a);
+    b.querySelector("small").textContent = [cat(a).label, a.marque, a.couleur].filter(Boolean).join(" · ");
+    b.onclick = () => openArticle(i);
+    $("items").append(b);
+  });
+  screen("s-list");
+}
+
+function openArticle(i) { currentIdx = i; showResult(articles[i]); }
+
+function showResult(d) {
+  current = d; active = 0;
+  if (isUncertain(d)) { const i = d.requetes.findIndex(r => /quivalent/i.test(r.type)); active = i >= 0 ? i : d.requetes.length - 1; }
+  const [cls, label] = d.manual ? ["sure", "Ta recherche"] : (CONF[d.confiance] || CONF.moyenne);
+  $("pill").className = "pill " + cls; $("pill").textContent = label;
+  $("resTitle").textContent = titleOf(d);
+  $("resMeta").textContent = [cat(d).label, d.marque || (d.manual ? "" : "Marque non visible"), d.couleur, d.matiere].filter(Boolean).join(" · ");
+  $("resPrice").hidden = !d.prix_neuf_estime; $("resPrice").textContent = d.prix_neuf_estime ? "Prix neuf : " + d.prix_neuf_estime : "";
+  const src = d.manual ? "" : photos[d.imageIdx]?.url;
+  $("resImg").hidden = !src; if (src) setImg($("resImg"), src);
+  $("backToList").hidden = d.manual || articles.length < 2;
+  $("fixToggle").hidden = !!d.manual;
+  $("fixBox").hidden = !(isUncertain(d) && !d.manual);
+  $("fixText").textContent = isUncertain(d)
+    ? "On n'a pas vu la marque, on te propose donc des alternatives similaires. Tu la connais ? Ajoute-la ici."
+    : "Dis-nous la marque ou le type d'objet, on relance l'analyse.";
+  $("fixInput").value = d.hint || "";
+  renderModes(); renderSites();
+  screen("s-result");
+}
+
+function renderModes() {
+  $("modes").innerHTML = "";
+  current.requetes.forEach((r, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "mode"; b.setAttribute("role", "radio");
+    b.setAttribute("aria-checked", String(i === active));
+    b.innerHTML = '<span class="dot"></span><span><strong></strong><small></small></span>';
+    b.querySelector("strong").textContent = current.manual ? "Ta recherche" : (cat(current).modes[i] || r.type);
+    b.querySelector("small").textContent = "« " + r.q + " »";
+    b.onclick = () => { active = i; renderModes(); renderSites(); };
+    $("modes").append(b);
+  });
+}
+function renderSites() {
+  const q = encodeURIComponent(current.requetes[active].q);
+  $("sites").innerHTML = "";
+  for (const s of cat(current).sites) {
+    const a = document.createElement("a");
+    a.className = "site"; a.href = s.url(q); a.target = "_blank"; a.rel = "noopener";
+    a.innerHTML = '<span class="badge"></span><span><strong></strong><small></small></span><span class="arrow" aria-hidden="true">→</span>';
+    a.querySelector(".badge").textContent = s.name[0];
+    a.querySelector("strong").textContent = "Voir sur " + s.name;
+    a.querySelector("small").textContent = s.what;
+    $("sites").append(a);
+  }
+}
+
+function resetAll() {
+  photos.forEach(p => URL.revokeObjectURL(p.url));
+  photos = []; articles = []; current = null;
+  $("manualInput").value = ""; startError(""); screen("s-start");
+}
+
+/* ---------- Événements ---------- */
+$("file").addEventListener("change", e => { const f = e.target.files; if (f?.length) addPhotos(f); e.target.value = ""; });
+$("camera").addEventListener("change", e => { const f = e.target.files; if (f?.length) addPhotos(f); e.target.value = ""; });
+for (const [lbl, input] of [["pick", "file"], ["pickCamera", "camera"]]) {
+  $(lbl).addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $(input).click(); } });
+}
+["dragenter", "dragover"].forEach(t => $("drop").addEventListener(t, e => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave", "drop"].forEach(t => $("drop").addEventListener(t, e => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", e => { if (e.dataTransfer.files.length) addPhotos(e.dataTransfer.files); });
+document.addEventListener("paste", e => {
+  if ($("s-start").hidden) return;
+  const files = [...(e.clipboardData?.items || [])].filter(i => i.type.startsWith("image/")).map(i => i.getAsFile()).filter(Boolean);
+  if (files.length) { e.preventDefault(); addPhotos(files); }
+});
+$("toManual").onclick = () => { $("manualForm").hidden = false; $("toManual").hidden = true; $("manualInput").focus(); };
+$("manualForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const q = $("manualInput").value.trim().toLowerCase(); if (!q) return;
+  articles = [];
+  showResult({ manual: true, modele: $("manualInput").value.trim(), requetes: [{ type: "Ta recherche", q }] });
+});
+$("cancel").onclick = () => ctl?.abort();
+$("retryBtn").onclick = () => { const r = lastRetry; startError(""); r?.(); };
+$("backToList").onclick = showList;
+$("fixToggle").onclick = () => { $("fixBox").hidden = !$("fixBox").hidden; if (!$("fixBox").hidden) $("fixInput").focus(); };
+$("fixForm").addEventListener("submit", e => { e.preventDefault(); if (currentIdx >= 0 && !current?.manual) rerun(currentIdx, $("fixInput").value.trim()); });
+$("again").onclick = resetAll;
+$("againList").onclick = resetAll;
+$("codeBack").onclick = () => { pendingRetry = null; articles = []; screen("s-start"); };
+$("codeForm").addEventListener("submit", e => {
+  e.preventDefault();
+  try { localStorage.setItem("chineur-code", $("codeInput").value.trim()); } catch {}
+  if (pendingRetry) { const r = pendingRetry; pendingRetry = null; r(); } else screen("s-start");
+});
+
+/* ---------- Écran d'accueil (version en ligne uniquement) ---------- */
+(() => {
+  if (window.claude) return; // aperçu dans Claude : pas d'installation
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem("chineur-install-off") === "1"; } catch {}
+  if (standalone || dismissed) return;
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  if (ios) { $("installIos").hidden = false; $("install").hidden = false; }
+  let deferred = null;
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault(); deferred = e;
+    $("installOther").hidden = false; $("installBtn").hidden = false; $("install").hidden = false;
+  });
+  $("installBtn").onclick = async () => {
+    if (!deferred) return;
+    deferred.prompt(); await deferred.userChoice.catch(() => null); deferred = null; $("install").hidden = true;
+  };
+  $("installClose").onclick = () => {
+    $("install").hidden = true;
+    try { localStorage.setItem("chineur-install-off", "1"); } catch {}
+  };
+})();
+</script>
+
+</body></html>
