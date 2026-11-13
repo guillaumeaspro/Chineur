@@ -326,6 +326,7 @@ const S = {
   ebay: what => ({ name: "eBay", what, url: q => "https://www.ebay.fr/sch/i.html?_nkw=" + q }),
   depop: what => ({ name: "Depop", what, url: q => "https://www.depop.com/search/?q=" + q }),
   backmarket: what => ({ name: "Back Market", what, url: q => "https://www.backmarket.fr/fr-fr/search?q=" + q }),
+  etsy: what => ({ name: "Etsy", what, url: q => "https://www.etsy.com/fr/search?q=" + q }),
   marketplace: what => ({ name: "Facebook Marketplace", what, url: q => "https://www.facebook.com/marketplace/search/?query=" + q }),
 };
 const CATEGORIES = {
@@ -336,7 +337,7 @@ const CATEGORIES = {
     S.backmarket("Reconditionné et garanti"), S.lbc("Entre particuliers, souvent moins cher"), S.ebay("Neuf, occasion et enchères"),
     S.vinted("Petits prix entre particuliers"), S.marketplace("Entre particuliers, près de chez toi")] },
   maison: { label: "Maison", modes: ["Le même meuble ou objet", "Plus de choix", "Un style similaire"], sites: [
-    S.lbc("Le plus de meubles d'occasion"), S.marketplace("Entre voisins, à récupérer sur place"), S.vinted("Déco et petits objets"),
+    S.lbc("Le plus de meubles d'occasion"), S.marketplace("Entre voisins, à récupérer sur place"), S.etsy("Vintage, affiches et déco faite main"), S.vinted("Déco et petits objets"),
     S.ebay("Vintage et pièces de designers")] },
   loisirs: { label: "Loisirs", modes: ["Le même article", "Plus de choix", "Une alternative"], sites: [
     S.lbc("Sport, vélos, jeux et bien plus"), S.vinted("Jouets, livres, puériculture"), S.ebay("Collection et pièces rares"),
